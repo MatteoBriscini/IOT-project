@@ -12,10 +12,10 @@
 <div style="page-break-after: always;"></div>
 
 ## **Requirements summary**
-Use node-red to parse a sequence of MQTT messages (saved in [challenge3.csv](challenge3.csv)) and perform different actions based on the message's content.
+Use node-red to parse a sequence of MQTT messages (saved in [challenge3.csv](csv\challenge3.csv)) and perform different actions based on the message's content.
 In particular:
-* if a message contains "Publish Message" the node will forward the message on the specified MQTT topic and the message payload is saved inside [filtered_pubs.csv]().
-* if the message contains an MQTT ACK the node will increment a global ack counter, perform an HTTP request on [ThingSpeack](https://thingspeak.com/channels/2507855) update the field1 value with the ack number, the message content is saved inside [ack_log.csv]().
+* if a message contains "Publish Message" the node will forward the message on the specified MQTT topic and the message payload is saved inside [filtered_pubs.csv](csv\filtered_pubs.csv).
+* if the message contains an MQTT ACK the node will increment a global ack counter, perform an HTTP request on [ThingSpeack](https://thingspeak.com/channels/2507855) update the field1 value with the ack number, the message content is saved inside [ack_log.csv](csv\ack_log.csv).
 * other messages will be discarded.
 
 ## **Implementation**
@@ -24,6 +24,7 @@ We will split the whole implementation into 3 different phases: data generation,
 ### **Data generation**
 ![alt text](img\nodeRedschema1.png)<br>
 In this phase the flow will generate random data save it in a CSV file and send it locally through MQTT on the "challenge3/id_generator" topic with the following payload. If the inject named "timestamp" is enabled message will be sent with a rate of 1 message every 5 seconds.
+All the messages sent in this phase are saved in a CSV file, named [id_log.csv](csv\id_log.csv).
 ```
  {"id": 7781, "timestamp":1710930219} //message payload example
 ```
