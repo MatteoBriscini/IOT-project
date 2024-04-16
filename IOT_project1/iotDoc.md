@@ -10,30 +10,27 @@
 # IOT_project1
 #### Briscini matteo [10709075] <br><br><br>
 #### INDEX: <br>
-- [IOT\_project1](#iot_project1)
-      - [Briscini matteo \[10709075\] ](#briscini-matteo-10709075-)
-      - [INDEX: ](#index-)
-  - [**Requirements summary**](#requirements-summary)
-  - [**Implementation**](#implementation)
-    - [**Performing a sensor data measurement**](#performing-a-sensor-data-measurement)
-    - [**Sending info on the parking state**](#sending-info-on-the-parking-state)
-    - [**Going to deep sleep**](#going-to-deep-sleep)
-  - [**Data analysis**](#data-analysis)
-    - [**esp32 duty cycle**](#esp32-duty-cycle)
-    - [**hc-sr04 energy absorption**](#hc-sr04-energy-absorption)
-    - [**esp\_now energy absorption**](#esp_now-energy-absorption)
-    - [**Analysis on data summary**](#analysis-on-data-summary)
-  - [**Battery life estimation**](#battery-life-estimation)
-    - [**Deep sleep power absorption**](#deep-sleep-power-absorption)
-    - [**Distance measure power absorption**](#distance-measure-power-absorption)
-    - [**Transmission power absorption**](#transmission-power-absorption)
-    - [**Waiting for response power absorption**](#waiting-for-response-power-absorption)
-    - [**Total energy absorption and battery life estimation**](#total-energy-absorption-and-battery-life-estimation)
-  - [**Possible improvements**](#possible-improvements)
-    - [**Send and forget**](#send-and-forget)
-    - [**Longer deep-sleep time**](#longer-deep-sleep-time)
-    - [**Non constant deep-sleep time**](#non-constant-deep-sleep-time)
-    - [**Transmit only on changes**](#transmit-only-on-changes)
+1. [Requirements summary](#requirements-summary)
+2. [Implementation](#implementation)
+    - [Performing a sensor data measurement](#performing-a-sensor-data-measurement)
+    - [Sending info on the parking state](#sending-info-on-the-parking-state)
+    - [Going to deep sleep](#going-to-deep-sleep)
+3. [Data analysis](#data-analysis)
+    - [esp32 duty cycle](#esp32-duty-cycle)
+    - [hc-sr04 energy absorption](#hc-sr04-energy-absorption)
+    - [esp_now energy absorption](#esp_now-energy-absorption)
+    - [Analysis on data summary](#analysis-on-data-summary)
+4. [Battery life estimation](#battery-life-estimation)
+    - [Deep sleep power absorption**](#deep-sleep-power-absorption)
+    - [Distance measure power absorption**](#distance-measure-power-absorption)
+    - [Transmission power absorption**](#transmission-power-absorption)
+    - [Waiting for response power absorption](#waiting-for-response-power-absorption)
+    - [Total energy absorption and battery life estimation](#total-energy-absorption-and-battery-life-estimation)
+5. [Possible improvements](#possible-improvements)
+    - [Send and forget](#send-and-forget)
+    - [Longer deep-sleep time](#longer-deep-sleep-time)
+    - [Non constant deep-sleep time](#non-constant-deep-sleep-time)
+    - [Transmit only on changes](#transmit-only-on-changes)
 
 
 
@@ -42,7 +39,7 @@
 ## **Requirements summary**
 ![alt text](img\sensor_schema.png)<br>
 The project goal is to implement parking occupancy node, on an ESP32 connected with the HC-SR04 ultrasonic distance sensor (as represented in the schematic above). <br>
-using esp_now for wifi communication purposes and a battery as an alimentation supply.
+Using esp_now for wifi communication purposes and a battery as an alimentation supply.
 > **note:** the parking is considered OCCUPIED if the measured distance is less than 50 cm
 
 ## **Implementation**
@@ -64,7 +61,7 @@ The HC-SR04 ultrasonic distance sensor has 4 pins:
 * **GND** ground
 * **TRIG** require a puls of 10uS to start the measure
 * **ECHO** to get the distance
-  > **note:** the distance is retrieved in terms of pulse durations (microseconds) the following formula is used to compute the distance in centimeters.
+  > **note:** the distance is retrieved in terms of pulse durations (microseconds), the following formula is used to compute the distance in centimeters.
   $$ D_{cm} = T_{pulseduration} \cdot 0.034/ 2 $$
 
 As specified in the documentation, this sensor can read distances between 2 cm - 450 cm. <br>
@@ -103,7 +100,7 @@ static const char *ParkingSpotStat_STRING[] = {
 
 ### **Sending info on the parking state**
 In this phase, the node turns on the wifi, sends the message (FREE or OCCUPIED) to the specified MAC address (throw esp_now protocol), waits for 2000 microseconds (to avoid communication error and to get an eventual response), and turns off the wifi again.
->**note:** in reality, the two last operations are implemented inside the *goToDeepSleep* function, but they are reported ear for clearness.
+>**note:** in reality, the two last operations are implemented inside the *goToDeepSleep* function, but they are reported here for clearness.
 
 Following are provided all the functions concern this phase:
 
@@ -155,7 +152,7 @@ void goToDeepSleep(){
 
 ## **Data analysis**
 To estimate battery life we measured real energy consumption data in different situations. On the provided samples we had to compute the k-mean estimator to ignore measurement noise.
-> **note:** we have notice differents consumption data in identical device state in different situations (probabily caused by experimentl erros), we are going allways to use the worst data available.
+> **note:** we have noticed differents consumption data in identical device state in different situations (probabily caused by experimentl erros), we are going always to use the worst data available.
 
 Following you can find a summary of the data analysis in terms of graphycal rappresentation and tables, but the full analysis provided [here](dataAnalysis.ipynb).
 
@@ -201,7 +198,7 @@ Let's consider the worst cases:
 * **free parking spot:**  $distance = 450 cm (max distance) \implies T_{sensor-measure} = 26470\cdot10^{-9}s$
 * **occupied parking spot:** $distance = 50 cm \implies T_{sensor-measure} = 2941\cdot10^{-9}s$
 
-As specified in the documentation the HC-SR04 requires, as a start-measure signal, that the input *trig* stay high for $\delta t =10\cdot10^{-9}s$, 
+As specified in the documentation, the HC-SR04 requires, as a start-measure signal, that the input *trig* stay high for $\delta t =10\cdot10^{-9}s$.
 <br>The worst case possible, in terms of power absorption required to perform distance measurements, is when the parking spot is always free:
 $$E_{sensor-measure} \cdot (T_{sensor-measure}+\delta t)= 1,2\cdot10^{-5}J$$ 
 A more reasonable situation is when the parking spot is free for 50% of the performed measures:
@@ -216,7 +213,7 @@ $$ E_{tx}^{2dBm} \cdot T_{tx} = 1,632\cdot10^{-3} J$$
 $$ E_{tx}^{19.5dBm} \cdot T_{tx} = 2,502\cdot10^{-3} J$$
 
 ### **Waiting for response power absorption**
-To avoid communication errors (and eventually receive messages) the sensors will wait with wifi antenna on for 2 ms after complete the state transmission.<br> We can compute the energy consumption in this phase as follows:
+To avoid communication errors (and eventually receive messages) the sensors will wait with wifi antenna on for 2 ms after completed the state transmission.<br> We can compute the energy consumption in this phase as follows:
 $$ E_{wifi-on} \cdot T_{wifi-on} = 1,551\cdot10^{-3} J $$
 
 ### **Total energy absorption and battery life estimation**
@@ -244,12 +241,12 @@ This improvement allows us to save $1,551\cdot10^{-3} J $ the equivalent of 4,35
 
 ### **Longer deep-sleep time**
 It is reasonable to think that increasing the deep sleep time is a great improvement, but this is not the case.<br> 
-Due to the limited amount of power, and time, required to perform a single parking state measure and send it to the sink node, increasing the distance between two measures doesn't provides a significant advantage.<br>
+Due to the limited amount of power, and time, required to perform a single parking state measure and to send the data to the sink node, increasing the distance between two measures doesn't provides a significant advantage.<br>
 For example, by modifying the deep sleep time to 3 minutes it's possible to achieve 842 cycles equivalent to 42,1 hours, instead of 42 hours.<br>
 This limited improvement can't justify the compromise in terms of the sensor responsiveness.
 ### **Non constant deep-sleep time**
-Similar to commercial movement sensors based on Zigbee, we can change the deep sleep time value based on the last sensor state (parking spot free or not), applying a longer time for the state that requires a larger amount of energy (the free park in this case).<br>
-As discussed in the previous paragraph, this can't improve in a significant way the battery life. Unless in our specific application, we are more interested detect when the parking becomes free (instead of when it becomes occupied) the compromise is probably acceptable.
+Similar to commercial movement sensors based on Zigbee, we can change the deep sleep time value based on the last sensor state (free or not parking spot), applying a longer time for the state that requires a larger amount of energy (the free park in this case).<br>
+As discussed in the previous paragraph, this can't improve in a significant way the battery life; unless in our specific application, we are more interested into detecting when the parking becomes free (instead of when it becomes occupied), in this case the compromise is probably acceptable.
 ### **Transmit only on changes**
 The idea is to save the data read from the HC-SR04 sensor in the flash memory (nonvolatile). At each new cycle the data D(t) is compared with the previous data saved in the flash D(t-1), so the sensor will communicate with the sink node and update the data in the flash memory $iff D(t) \neq D(T-1)$, otherwise the ESP32 can go directly into deep sleep, without powering on the wifi antenna and send the data to the risk node. <br>
 Assuming the parking spot changes status, in mean, every 3 hours, with this approach we avoid comunicate the node status 5035 times in 42h, saving about $12.63J$ (avoiding transmition at 19.5 dBm) the equivalent of 7,01 cycles. <br><br>
@@ -276,4 +273,4 @@ ParkingSpotState getPreviousState(){
 <br>
 In conclusion, there are no ways to stretch the battery life in a significant way by simply adapting the implementation.<br>
 Due to the large amount of energy used in deep sleep mode in comparison with the other phases, there is no possibility to achieve consistent battery life  without providing an external energy supply.<br>
-However a little solar panel is ideal, to supply all the required power for 24 hours.
+However a little solar panel is ideal to supply all the required power for 24 hours.
