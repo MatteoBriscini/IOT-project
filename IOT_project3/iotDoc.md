@@ -82,11 +82,11 @@ when the flow has already received 80 messages or occurs in error (in every stag
 
 ### **Message reaction**
 ![alt text](img\nodeRedschema3.png)<br>
-the requirements ask to react to 2 different classes of messages: pubblish messages and ack messages.
-#### **publish reaction**
-This block react to MQTT messages of class "Publish Message", in particular pubblishing messages with specified payload on the required MQTT topic. Additional if a message payload contains a temperature in fahrenheit that payload is saved in the [filtered_pubs.csv](csv\filtered_pubs.csv) file and its value is plotted on a UI graph, a screenshot of this graph is provided below. <br> <br>
+the requirements ask to react to 2 different message classes: published and ack messages.
+#### **Publish reaction**
+This block reacts to MQTT messages of class "Publish Message", in particular publishing messages with specified payload on the required MQTT topic. Additionally, if a message payload contains a temperature in Fahrenheit that payload is saved in the [filtered_pubs.csv](csv\filtered_pubs.csv) file and its value is plotted on a UI graph, a screenshot of this graph is provided below. <br> <br>
 ![alt text](img\tempGraph.png) <br> <br>
-As shown in the following example a single can contains multiple MQTT topic and payload, in this terms the "input data parser" function block has the role to split the input message (a single string) in two arrays with the topics and the playload of all the messages.
+As shown in the following example a single can contain multiple MQTT topics and payload, in this terms the "input data parser" function block has the role of splitting the input message (a single string) in two arrays with the topics and the payload of all the messages.
   ```
   // received info & payload example, containing all the message payload and top where forward
   "Publish Message [hospital/room2], Publish Message [hospital/building5], Publish Message [hospital/department2]","{""range"": [4, 50], ""description"": ""Room Temperature"", ""type"": ""temperature"", ""unit"": ""C"", ""lat"": 66, ""long"": 92},{""type"": ""temperature"", ""lat"": 81, ""long"": 95, ""unit"": ""C"", ""range"": [3, 50], ""description"": ""Room Temperature""},{""description"": ""Room Temperature"", ""lat"": 55, ""unit"": ""K"", ""type"": ""temperature"", ""long"": 88, ""range"": [7, 41]},"
@@ -105,8 +105,8 @@ As shown in the following example a single can contains multiple MQTT topic and 
 
 * **file parser**
 
-#### **ack reaction**
-This block react to MQTT messages containing an ACK (of any types); ack messages are save on [ack_log.csv](csv\ack_log.csv) file in terms of: timestamp, sub_id, msg_type, also the flow will count the total ammount of ack messages (on a global counter) and pubblish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
+#### **Ack reaction**
+This block reacts to MQTT messages containing an ACK (of any type); ack messages are saved on [ack_log.csv](csv\ack_log.csv) file in terms of timestamp, sub_id, msg_type, also the flow will count the total amount of ack messages (on a global counter) and publish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
 
 #### *Relevant JS function & blocks*
 
@@ -118,3 +118,99 @@ This block react to MQTT messages containing an ACK (of any types); ack messages
 
 
 * **throw HTTP exception**
+
+
+## **Testing**
+A Python tool for testing purposes is provided [here](testIOT_3.ipynb). The idea for the testing is to verify the correct correlation between the various CSV published from the flow on running.
+> **note:** to generate a CSV file useful for testing, it is necessary to disable the limit on messages per second for the "publish reaction" brach otherwise some messages can be discarded. CSV files generate in such way are provided in this [folder](csv\testing_output).
+
+<br>
+
+following is provided a test output:
+![alt text](img\outputTest.png)
+
+#### Entire output
+|index|id|type|response|
+|---|---|---|---|
+|0|989|Publish Ack \(id=25\)|🟢|
+|1|1008|others|🟢|
+|2|845|Publish Message \[K\]|🟢|
+|3|2964|Publish Message|🟢|
+|4|1154|Publish Message \[K\]|🟢|
+|5|2529|Publish Message \[K\]|🟢|
+|6|446|Publish Message|🟢|
+|7|3362|others|🟢|
+|8|4807|Publish Message|🟢|
+|9|154|others|🟢|
+|10|3765|Publish Message|🟢|
+|11|1565|Publish Message \[K\]|🟢|
+|12|3464|Publish Message \[K\]|🟢|
+|13|1536|others|🟢|
+|14|1632|Publish Message|🟢|
+|15|498|Publish Message|🟢|
+|16|2496|Publish Message|🟢|
+|17|4636|others|🟢|
+|18|2265|others|🟢|
+|19|399|Publish Message \[K\]|🟢|
+|20|2063|Publish Message|🟢|
+|21|3673|others|🟢|
+|22|1496|others|🟢|
+|23|1247|Publish Message|🟢|
+|24|3465|Publish Message \[K\]|🟢|
+|25|339|others|🟢|
+|26|1514|Publish Message \[K\]|🟢|
+|27|632|Publish Ack \(id=10\)|🟢|
+|28|4742|Publish Message \[K\]|🟢|
+|29|2693|Publish Message|🟢|
+|30|1244|others|🟢|
+|31|2093|Publish Message|🟢|
+|32|3773|Publish Message|🟢|
+|33|1434|Publish Message|🟢|
+|34|3709|Publish Message|🟢|
+|35|162|others|🟢|
+|36|2827|Publish Message \[K\]|🟢|
+|37|3762|others|🟢|
+|38|2275|Publish Message|🟢|
+|39|4015|Publish Message|🟢|
+|40|3349|Publish Message \[K\]|🟢|
+|41|15|others|🟢|
+|42|3567|Publish Message|🟢|
+|43|4883|others|🟢|
+|44|1907|others|🟢|
+|45|3529|Publish Message|🟢|
+|46|101|Subscribe Ack \(id=6\)|🟢|
+|47|2820|others|🟢|
+|48|238|others|🟢|
+|49|3845|Publish Message|🟢|
+|50|4179|others|🟢|
+|51|1509|others|🟢|
+|52|226|others|🟢|
+|53|649|Publish Message \[K\]|🟢|
+|54|1279|others|🟢|
+|55|4732|Publish Message|🟢|
+|56|623|Publish Ack \(id=8\)|🟢|
+|57|3397|Publish Message|🟢|
+|58|1940|others|🟢|
+|59|3873|Publish Message \[K\]|🟢|
+|60|654|Publish Message|🟢|
+|61|2956|Publish Message \[K\]|🟢|
+|62|4226|Publish Message|🟢|
+|63|2340|Publish Message|🟢|
+|64|4664|Publish Message \[K\]|🟢|
+|65|921|Publish Message|🟢|
+|66|3334|Publish Message|🟢|
+|67|1795|Publish Message|🟢|
+|68|3307|others|🟢|
+|69|4433|Publish Message \[K\]|🟢|
+|70|986|Publish Message \[K\]|🟢|
+|71|1190|Publish Message|🟢|
+|72|391|Publish Message|🟢|
+|73|3709|Publish Message|🟢|
+|74|3746|others|🟢|
+|75|1965|Publish Message|🟢|
+|76|1807|others|🟢|
+|77|3600|Publish Message|🟢|
+|78|3810|Publish Message|🟢|
+|79|118|Subscribe Ack \(id=3\)|🟢|
+|80|1623|others|🟢|
+

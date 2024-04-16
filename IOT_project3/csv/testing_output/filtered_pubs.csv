@@ -1,0 +1,20 @@
+no,long,range,lat,type,unit,description
+0,48,"[4,37]",53,temperature,F,Room Temperature
+1,96,"[1,47]",58,temperature,F,Room Temperature
+2,90,"[9,42]",51,temperature,F,Room Temperature
+3,76,"[4,58]",55,temperature,F,Room Temperature
+4,53,"[5,55]",95,temperature,F,Room Temperature
+5,73,"[5,43]",64,temperature,F,Room Temperature
+6,53,"[5,55]",95,temperature,F,Room Temperature
+7,85,"[7,38]",77,temperature,F,Room Temperature
+8,82,"[0,45]",80,temperature,F,Room Temperature
+9,81,"[8,31]",62,temperature,F,Room Temperature
+10,86,"[7,37]",40,temperature,F,Room Temperature
+11,59,"[1,32]",81,temperature,F,Room Temperature
+12,95,"[4,57]",45,temperature,F,Room Temperature
+13,87,"[2,55]",67,temperature,F,Room Temperature
+14,93,"[1,53]",80,temperature,F,Room Temperature
+15,95,"[10,37]",63,temperature,F,Room Temperature
+16,85,"[4,57]",85,temperature,F,Room Temperature
+17,72,"[4,44]",50,temperature,F,Room Temperature
+18,62,"[9,57]",67,temperature,F,Room Temperature

@@ -3,6 +3,7 @@
         "id": "d61cd01868e57abd",
         "type": "inject",
         "z": "0b25a34679899bc4",
+        "d": true,
         "name": "",
         "props": [
             {
@@ -445,7 +446,8 @@
             "f8721b9da903f229",
             "7b581e95f91831a1",
             "a78af70bea271705",
-            "b5e471487c0ed5c3"
+            "b5e471487c0ed5c3",
+            "b1f937107a5f4b59"
         ],
         "x": 55,
         "y": 660,
@@ -527,8 +529,7 @@
         "y": 960,
         "wires": [
             [
-                "10ce9c02b1e8a2b4",
-                "bcfb5edbe2ab5762"
+                "10ce9c02b1e8a2b4"
             ]
         ]
     },
@@ -547,7 +548,7 @@
         "type": "function",
         "z": "0b25a34679899bc4",
         "name": "response message generator",
-        "func": "let msgList = [];\n\nlet mqtt_topic = msg.payload.col9;\nlet id = msg.payload.col1;\nlet mqtt_payload = msg.payload.col10;\n\nif(!mqtt_topic)mqtt_topic = global.get(\"mqttDefaulChannel\");\n\nmqtt_topic.forEach((element, i) => {\n\n  element = element.replace(\"Publish Message [\", '');\n  element = element.replace(\"]\", '');\n  element = element.replace(\" \", '');\n\n  let jsonMessage = {\n    \"timestamp\": Date.now(),\n    \"id\": id\n  };\n\n  if (mqtt_payload) {\n    jsonMessage.payload = mqtt_payload[i];\n  }\n\n// Now you can use the jsonMessage object\n\n\n  msg.topic = element;\n  msg.payload = JSON.stringify(jsonMessage);\n  msgList.push(msg)\n});\n\nreturn [msgList];\n",
+        "func": "let msgList = [];\n\nlet mqtt_topic = msg.payload.col9;\nlet id = msg.payload.col1;\nlet mqtt_payload = msg.payload.col10;\n\nif(!mqtt_topic)mqtt_topic = global.get(\"mqttDefaulChannel\");\n\nmqtt_topic.forEach((element, i) => {\n\n  element = element.replace(\"Publish Message [\", '');\n  element = element.replace(\"]\", '');\n  element = element.replace(\" \", '');\n\n  let jsonMessage = {\n    \"timestamp\": Date.now(),\n    \"id\": id\n  };\n\n  if (mqtt_payload) {\n    jsonMessage.payload = mqtt_payload[i];\n  }\n\n// Now you can use the jsonMessage object\n\n  let tmp = {\n    topic : element,\n    payload : JSON.stringify(jsonMessage)\n  }\n  msgList.push(tmp);\n});\n\nreturn [msgList];\n",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -572,7 +573,7 @@
         "timeout": "5",
         "timeoutUnits": "seconds",
         "rate": "1",
-        "nbRateUnits": "4",
+        "nbRateUnits": "15",
         "rateUnits": "second",
         "randomFirst": "1",
         "randomLast": "5",
@@ -637,7 +638,7 @@
         "type": "function",
         "z": "0b25a34679899bc4",
         "name": "plot data in the graph",
-        "func": "let msgList = [];\n\nlet mqtt_payload = msg.payload.col10;\n\nif(mqtt_payload) mqtt_payload.forEach((element) => {\n\n\n    let jsonMessage = {\n        \"display\": +((element.type == \"temperature\") && (element.unit == \"F\")),\n        \"value\": (element.range[0] + element.range[1])/2,\n        \"original_payload\": msg.payload.col10\n    };\n    \n    msg.payload = jsonMessage;\n    msgList.push(msg)\n});\n\nreturn [msgList];",
+        "func": "let msgList = [];\n\nlet mqtt_payload = msg.payload.col10;\n\nif(mqtt_payload) mqtt_payload.forEach((element) => {\n\n\n    let jsonMessage = {\n        \"display\": +((element.type == \"temperature\") && (element.unit == \"F\")),\n        \"value\": (element.range[0] + element.range[1])/2,\n        \"original_payload\": element\n    };\n    \n    let tmp = {\n        payload: jsonMessage\n    }\n    msgList.push(tmp)\n});\n\nreturn [msgList];",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -816,22 +817,6 @@
         ]
     },
     {
-        "id": "bcfb5edbe2ab5762",
-        "type": "debug",
-        "z": "0b25a34679899bc4",
-        "name": "debug 4",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 180,
-        "y": 1000,
-        "wires": []
-    },
-    {
         "id": "2b26bd7fdbba8811",
         "type": "file",
         "z": "0b25a34679899bc4",
@@ -853,7 +838,7 @@
         "type": "function",
         "z": "0b25a34679899bc4",
         "name": "file parser",
-        "func": "\nlet data = {\n    no: global.get(\"tempCounter\"),\n    long: msg.payload.original_payload[0].long,\n    range: msg.payload.original_payload[0].range,\n    lat: msg.payload.original_payload[0].lat,\n    type: msg.payload.original_payload[0].type,\n    unit: msg.payload.original_payload[0].unit,\n    description: msg.payload.original_payload[0].description\n}\nmsg.payload = data\n\nglobal.set(\"tempCounter\", (global.get(\"tempCounter\")+1));\n\nreturn msg;",
+        "func": "\nlet data = {\n    no: global.get(\"tempCounter\"),\n    long: msg.payload.original_payload.long,\n    range: msg.payload.original_payload.range,\n    lat: msg.payload.original_payload.lat,\n    type: msg.payload.original_payload.type,\n    unit: msg.payload.original_payload.unit,\n    description: msg.payload.original_payload.description\n}\nmsg.payload = data\n\nglobal.set(\"tempCounter\", (global.get(\"tempCounter\")+1));\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
