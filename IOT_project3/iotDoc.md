@@ -9,6 +9,13 @@
 #### Briscini matteo [10709075] <br><br><br>
 #### INDEX: <br>
 
+1. [Requirements summary](#requirements-summary)
+2. [Implementation](#implementation)
+   * [Data generation](#data-generation)
+   * [Data receiving and message parsing](#data-receiving-and-message-parsing)
+   * [Message reaction](#message-reaction)
+3. [Testing](#testing)
+
 <div style="page-break-after: always;"></div>
 
 ## **Requirements summary**
@@ -25,7 +32,7 @@ We will split the whole implementation into 3 different phases: data generation,
 
 ### **Data generation**
 ![alt text](img\nodeRedschema1.png)<br>
-In this phase the flow will generate random data save it in a CSV file and send it locally through MQTT on the "challenge3/id_generator" topic with the following payload. If the inject named "timestamp" is enabled message will be sent with a rate of 1 message every 5 seconds.
+In this phase the flow will generate random data, it will save it in a CSV file and send it locally through MQTT on the "challenge3/id_generator" topic with the following payload. If the inject named "timestamp" is enabled, a message every 5 seconds will be sent.
 All the messages sent in this phase are saved in a CSV file, named [id_log.csv](csv\id_log.csv).
 ```
  {"id": 7781, "timestamp":1710930219} //message payload example
@@ -36,7 +43,7 @@ All the messages sent in this phase are saved in a CSV file, named [id_log.csv](
 
 #### *Relevant JS function & blocks*
 * **config (on start)** <br>
- initializes all global variables to the desired values.
+  It initializes all global variables to the desired values.
   ```
   // Code added here will be run once
   // whenever the node is started.
@@ -47,7 +54,7 @@ All the messages sent in this phase are saved in a CSV file, named [id_log.csv](
   global.set("thingSpeakKey","VI5VOWUDI8Z5GCF1")
   ```
 * **message1 setup (on message)**  <br>
-  setup the received MQTT message.
+  It prepares the MQTT message.
   ```
   let mqtt_topic = String(global.get("mqttDefaulChannel"));  //get topic
   let jsonMessage = { "id": Math.random() * 5000, "timestamp": msg.payload};  //generate random paylod for the mqtt msg
@@ -62,31 +69,31 @@ All the messages sent in this phase are saved in a CSV file, named [id_log.csv](
 
 ### **Data receiving and message parsing**
 ![alt text](img\nodeRedschema2.png)<br>
-this block will receive up to 80 messages on "challenge3/id_generator" topic, and use the message id to get the correct row in the [challenge3.csv](challenge3.csv) file, based on the row content the flow will be reacting differently (as specified in requirement summary), in this phase the correct reaction is triggered. <br>
-when the flow has already received 80 messages or occurs in error (in every stage), the stop function sets "is ready?" to false stopping messages publishing on the "challenge3/id_generator" topic.
+This block will receive up to 80 messages on "challenge3/id_generator" topic, and it uses the message id to get the correct row in the [challenge3.csv](challenge3.csv) file; based on the row content, the flow will be reacting differently (as specified in requirement summary). In this phase the correct reaction is triggered. <br>
+When the flow has already received 80 messages or occurs in error (in every stage), the stop function sets "is ready?" to false, stopping messages publishing on the "challenge3/id_generator" topic.
 
 #### *Relevant JS function & blocks*
 * **mqtt input parser (on message)** <br>
-  parse the received MQTT message.
+  It parses the received MQTT message.
   ```
   global.set("receivedMessagesCounter", (global.get("receivedMessagesCounter")+1));  //increment the message counter
-  msg.payload = parseInt(msg.payload.id % 7711);  //comput the row number
+  msg.payload = parseInt(msg.payload.id % 7711);  //compute the row number
   return msg;
   ```
 * **get required csv tupla (on message)** <br>
-  select the correct row from the CSV file using the received id previously saved as a flow variable.
+  It selects the correct row from the CSV file using the received id previously saved as a flow variable.
 * **reaction choice switch** <br>
-  based on the receive message trigger the correct reaction, if required.
+  Based on the received message, if required it triggers the correct reaction.
 
 <div style="page-break-after: always;"></div>
 
 ### **Message reaction**
 ![alt text](img\nodeRedschema3.png)<br>
-the requirements ask to react to 2 different message classes: published and ack messages.
+The requirements ask to react to 2 different message classes: published and ACK messages.
 #### **Publish reaction**
-This block reacts to MQTT messages of class "Publish Message", in particular publishing messages with specified payload on the required MQTT topic. Additionally, if a message payload contains a temperature in Fahrenheit that payload is saved in the [filtered_pubs.csv](csv\filtered_pubs.csv) file and its value is plotted on a UI graph, a screenshot of this graph is provided below. <br> <br>
+In this phase the flow will react to MQTT messages of class "Publish Message", in particular publishing messages with specified payload on the required MQTT topic. Additionally, if a message payload contains a temperature in Fahrenheit, it is saved in the [filtered_pubs.csv](csv\filtered_pubs.csv) file and its value is plotted on a UI graph (a screenshot of this graph is provided below). <br> <br>
 ![alt text](img\tempGraph.png) <br> <br>
-As shown in the following example a single can contain multiple MQTT topics and payload, in this terms the "input data parser" function block has the role of splitting the input message (a single string) in two arrays with the topics and the payload of all the messages.
+As shown in the following example, a single message can contain multiple MQTT topics and payload. In this terms the "input data parser" function block has the role of splitting the input message (a single string) in two arrays, containing respectively the topics and the payload of all the messages.
   ```
   // received info & payload example, containing all the message payload and top where forward
   "Publish Message [hospital/room2], Publish Message [hospital/building5], Publish Message [hospital/department2]","{""range"": [4, 50], ""description"": ""Room Temperature"", ""type"": ""temperature"", ""unit"": ""C"", ""lat"": 66, ""long"": 92},{""type"": ""temperature"", ""lat"": 81, ""long"": 95, ""unit"": ""C"", ""range"": [3, 50], ""description"": ""Room Temperature""},{""description"": ""Room Temperature"", ""lat"": 55, ""unit"": ""K"", ""type"": ""temperature"", ""long"": 88, ""range"": [7, 41]},"
@@ -95,39 +102,128 @@ As shown in the following example a single can contain multiple MQTT topics and 
 <div style="page-break-after: always;"></div>
 
 #### *Relevant JS function & blocks*
-* **input data parser**
 
-* **response messages generator**
+* **input data parser** <br>
+  This block has to parse the input string into 2 arrays of JSON objects.
+  ```
+  msg.payload.col9 = String(msg.payload.col9).split(',');  //parse all the MQTT topics and split them inside an array
 
-* **plot data in the graph**
+  if (msg.payload.col10) msg.payload.col10 = JSON.parse("[" + msg.payload.col10 + "]"); //parse all the MQTT payloads and split them inside an array
+  return msg;
+  ```
 
-* **graph parser**
+* **response messages generator** <br>
+  This block receives as input the 2 lists containing the topics and the payloads in a raw form and it has to translate it into the required format for the MQTT message.
+  ```
+  let msgList = [];
 
-* **file parser**
+  let mqtt_topic = msg.payload.col9;
+  let id = msg.payload.col1;
+  let mqtt_payload = msg.payload.col10;
+
+  if(!mqtt_topic)mqtt_topic = global.get("mqttDefaulChannel");
+
+  mqtt_topic.forEach((element, i) => {  //iterate on all the message topics and payloads
+
+    element = element.replace("Publish Message [", '');  //remove useless parts from the message topic
+    element = element.replace("]", '');
+    element = element.replace(" ", '');
+
+    let jsonMessage = {     //prepare the message payload to send
+      "timestamp": Date.now(),
+      "id": id
+    };
+
+    if (mqtt_payload) {   //if the received message has a payload add it to the new message
+      jsonMessage.payload = mqtt_payload[i];
+    }
+
+    let tmp = {     //prepare the output object
+      topic : element,
+      payload : JSON.stringify(jsonMessage)
+    }
+    msgList.push(tmp);    //add the output object to the output list
+  });
+
+  return [msgList];
+  ```
+
+
+* **plot data in the graph** <br>
+  This block receives as input the list containing the payloads in raw form and has to compute the new value for the temperature graph; additionally, this block will prepare the pass condition (if the message contains temperature data with Fahrenheit as the measuring unit) for the following switch block.
+  ```
+  let msgList = [];
+
+  let mqtt_payload = msg.payload.col10;
+
+  if (mqtt_payload) mqtt_payload.forEach((element) => {    //iterate on all the message payloads
+
+      let jsonMessage = {         
+          "display": +((element.type == "temperature") && (element.unit == "F")), //evaluate the pass condition, "display" will be equal to one of the flow have to plot the data on the graph
+          "value": (element.range[0] + element.range[1])/2,   //compute the graph value
+          "original_payload": element     //copy the original payload is necessary to save it in the CSV file
+      };
+      
+      let tmp = {     //prepare the output object
+          payload: jsonMessage
+      }
+      msgList.push(tmp);    //add the output object to the output list
+  });
+
+  return [msgList];
+  ```
+* **graph parser** <br>
+  This block gets the input message value discarding all the other input data not useful anymore.
+
+* **file parser** <br>
+  This block translates the original message payload in raw form, copied before, in the correct format required for the CSV file.
+
 
 #### **Ack reaction**
-This block reacts to MQTT messages containing an ACK (of any type); ack messages are saved on [ack_log.csv](csv\ack_log.csv) file in terms of timestamp, sub_id, msg_type, also the flow will count the total amount of ack messages (on a global counter) and publish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
+In this phase the flow will react to MQTT messages containing an ACK (of any type). ACK messages are saved on [ack_log.csv](csv\ack_log.csv) file in terms of timestamp, sub_id, msg_type. Additionally, the flow will count the total amount of ACK messages (on a global counter) and it will publish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
+
+<div style="page-break-after: always;"></div>
 
 #### *Relevant JS function & blocks*
 
-* **input data parser & counter increment**
+* **input data parser & counter increment** <br>
+  This block receives as input the original ACK message and has to translate it in the required format to save the ACK in the CSV file; additionally, it will increment the global ACK counter.
+  ```
+  global.set("ACKCounter", (global.get("ACKCounter")+1));  //counter increment
 
+  let data = {            //data format translate
+      timestamp : Date.now(),
+      sub_id: msg.payload.col1,
+      msg_type: msg.payload.col9,
+  }
 
+  msg.payload = data;
 
-* **post url generator**
+  return msg;
+  ```
 
+* **post url generator** <br>
+  This block will dynamically generate the URL required to perform the HTTP get request to the thingspeak API.
+  ```
+  msg.url = "https://api.thingspeak.com/update?api_key=" + global.get("thingSpeakKey") + "&field1=" + global.get("ACKCounter")
+  return msg;
+  ```
 
-* **throw HTTP exception**
+* **throw HTTP exception** <br>
+  The thingspeak API will respond with zero in case of problems with the HTTP get request, if such value is received this block will raise an exception consequently stopping the whole flow.
 
+<div style="page-break-after: always;"></div>
 
 ## **Testing**
-A Python tool for testing purposes is provided [here](testIOT_3.ipynb). The idea for the testing is to verify the correct correlation between the various CSV published from the flow on running.
-> **note:** to generate a CSV file useful for testing, it is necessary to disable the limit on messages per second for the "publish reaction" brach otherwise some messages can be discarded. CSV files generate in such way are provided in this [folder](csv\testing_output).
+A Python tool for testing purposes is provided [here](testIOT_3.ipynb). The purpose of the tester is to verify the correct correlation between the various CSV files published from the flow during a run.
+> **note:** to generate a CSV files useful for testing, it is necessary to disable the limit on messages per second for the "publish reaction" brach, otherwise some messages can be discarded. Some CSV files generated in such way are provided in this [folder](csv\testing_output).
 
 <br>
 
-following is provided a test output:
+Following is provided the full test output:
 ![alt text](img\outputTest.png)
+
+<div style="page-break-after: always;"></div>
 
 #### Entire output
 |index|id|type|response|
