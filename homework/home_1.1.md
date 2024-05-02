@@ -66,8 +66,43 @@ Pseudocode for clusterNode nodes (with redundancy):
     sendZigbeeMSG(aggregatedData);
   }
   ```
+
+<div style="page-break-after: always;"></div>
+
 ### **Q3 ~ as an add-on, you are required to install a VGA camera (640x480 pixels, 8 bits per pixel) to monitor the status of the growing process. Is the solution proposed at the previous points still valid? If not, propose an alternative solution.**
 
 The peripheral network can be maintained identically, by simply adding the VGA camera as a new sensor node. However the same can't be said for the main network, in fact ZigBee is not designed for high traffic and continuous communication, in this case, WiFi is a better way to go. <br>
 Alternativelly we can keep the previous network unchanged plugging the 20 cameras directly to the coordinator with a dedicate network wired (ethernet), or wirless (WiFi).
 >**note:** in the second case, particular attention is required to avoid interference, WiFi and Zigbee work on the same frequency-band (2.4 Ghz), channels must be seated properly.
+
+<div style="page-break-after: always;"></div>
+
+![alt text](track2.png)
+
+### **Q4**
+
+$$ BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s$$
+
+### **Q5**
+
+$$T_{slot}= \dfrac{L}{R} = \dfrac{128\cdot*8}{250\cdot10^3}=4,096\cdot10^{-3}s$$
+
+### **Q6**
+
+$$ T_{active} = T_{CFP} = 30\%\cdot BI = 0,03072s $$
+
+### **Q7**
+
+$$ N_{active-slots} = N_{slots} \cdot (0,3+0,6) =\left(\dfrac{T_{CFP}}{T_{slot}}-1\right)\cdot0,9=5,85\simeq 6$$
+
+### **Q8**
+
+$$ N_{active-slots} = N_{slots} \cdot 0,1 =\left(\dfrac{T_{CFP}}{T_{slot}}-1\right)\cdot0,1= 0,65\simeq 1$$
+
+### **Q9**
+
+$$ N_{slots} = \left(\dfrac{T_{CFP}}{T_{slot}}-1\right) = 6,5 \simeq 7 $$
+
+<div style="page-break-after: always;"></div>
+
+![alt text](track3.png)
