@@ -79,30 +79,49 @@ Alternativelly we can keep the previous network unchanged plugging the 20 camera
 
 ![alt text](track2.png)
 
-### **Q4**
+### **Q4 ~ What is the beacon interval (BI) in ms?**
 
-$$ BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s$$
+$$ BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s = 102,4ms$$
 
-### **Q5**
+### **Q5 ~ What is the slot time (Ts) in ms?**
 
-$$T_{slot}= \dfrac{L}{R} = \dfrac{128\cdot*8}{250\cdot10^3}=4,096\cdot10^{-3}s$$
+$$T_{slot}= \dfrac{L}{R} = \dfrac{128\cdot*8}{250\cdot10^3}=4,096\cdot10^{-3}s = 4,096ms$$
 
-### **Q6**
+### **Q6 ~ Assuming the maximum duty cycle allowed is 30%, what is the active part of the superframe (Tactive) in ms?**
 
-$$ T_{active} = T_{CFP} = 30\%\cdot BI = 0,03072s $$
+$$ T_{active} = T_{CFP} = 0,3\cdot BI = 0,03072s = 30,72ms $$
 
-### **Q7**
+### **Q7 ~ How many active slots are there in the CFP?**
 
-$$ N_{active-slots} = N_{slots} \cdot (0,3+0,6) =\left(\dfrac{T_{CFP}}{T_{slot}}-1\right)\cdot0,9=5,85\simeq 6$$
+$$ N_{slots} = \left(\dfrac{T_{CFP}}{T_{slot}}-1\right) = 6,5 \simeq 6 slots\space(lower\_approximation)$$
 
-### **Q8**
+$$ N_{active-slots} = N_{slots} \cdot (0,3+0,6) =\left(\dfrac{T_{CFP}}{T_{slot}}-1\right)\cdot0,9=5,85\simeq 5slots\space(lower\_approximation)$$
 
-$$ N_{active-slots} = N_{slots} \cdot 0,1 =\left(\dfrac{T_{CFP}}{T_{slot}}-1\right)\cdot0,1= 0,65\simeq 1$$
+### **Q8 ~ How many inactive slots are there in the CFP?**
 
-### **Q9**
+$$ N_{active-slots} = N_{slots} \cdot 0,1 =\left(\dfrac{T_{CFP}}{T_{slot}}-1\right)\cdot0,1= 0,65\simeq 1slots\space(upper\_approximation)$$
 
-$$ N_{slots} = \left(\dfrac{T_{CFP}}{T_{slot}}-1\right) = 6,5 \simeq 7 $$
+### **Q9 ~ How many motes can join the network?**
+considering the worst case (all the device transmit simultaneusly with r=20kb/s):
+
+$$ N_{devices} = N_{slots}\cdot\dfrac{min(r)}{max(r)}=6\cdot\dfrac{10}{20}=3devices $$
+
+
 
 <div style="page-break-after: always;"></div>
 
 ![alt text](track3.png)
+
+### **Q10 ~ What are the main factors you would look at to make your final choice?**
+Various environmental and economic factors can condition the choosing between LoRa and NB-Iot, however there are some key aspects to consider when choosing between LoRa and NB-IoT:
+* **Costs:** NB-IoT leverages licensed cellular spectrum owned by mobile operators, which may involve recurring costs based on data usage or subscription plans. On the other hand, LoRa requires a specific gateway and might involve upfront costs for hardware.
+* **Transmission range and interference avoidance:** Both LoRa and NB-IoT should have sufficient range.  However, LoRa relies on unlicensed bands and this can cause interference problems this makes it susceptible to interference, in particular from other devices using the same bands.
+Furthermore, LoRa is known for its long-range capabilities, especially in open areas; but NB-IoT offers good penetration through buildings and obstacles, which could be ideal for urban and indoor environments.
+* **Power Consumption:** Both LoRa and NB-IoT are designed to achieve low power consumption, but typically NB-IoT consumes more power than LoRa devices due to the cellular technology involved. 
+> **Note:** this last point is relevant only if hour weather monitoring station is battery powered.
+* **Security:** LoRa uses AES 128-bit encryption for data security, as opposed to a more robust 256-bit 3GPP encryption standard used by NB-IoT.
+> **Note:** also, data Rate and transmission latency can be relevant factors in the choice between LoRa and NB-IoT in some specific applications, however for weather monitoring applications data updates may not be frequent or large, so we will not consider those aspects in our choice.
+
+Finally, NB-IoT is better suited for dense urban environments where reliable data transmission and robust security are crucial and can pay off additional periodical costs.
+
+### **Q11 ~ You opt to use LoRa, using an open-source gateway close by (e.g., provided by the Things Network). However, your transmission are not successfull. What are the possible causes, and what kind of solutions could be adopted?**
