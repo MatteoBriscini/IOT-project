@@ -125,3 +125,5 @@ Furthermore, LoRa is known for its long-range capabilities, especially in open a
 Finally, NB-IoT is better suited for dense urban environments where reliable data transmission and robust security are crucial and can pay off additional periodical costs.
 
 ### **Q11 ~ You opt to use LoRa, using an open-source gateway close by (e.g., provided by the Things Network). However, your transmission are not successfull. What are the possible causes, and what kind of solutions could be adopted?**
+Assuming all the configuration parameters are well set and the transmission frequency is the range accepted from the LoRa gateway, LoRa relies on unlicensed bands and interferences are possible. Generally signal collision happens when 2 different signals overlap in the reception if and only if those 2 signals have the same spreading factors and the same frequency carries them. If collisions happen changing those 2 parameters can be enough to avoid them. <br>
+Also, the transmission power must be set correctly, according to the distance from the LoRa gateway, to overcome the receiver sensitivity.
