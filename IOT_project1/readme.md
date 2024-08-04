@@ -1,43 +1,4 @@
-
-<script type="text/javascript" 
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
-</script>
-
-
 # IOT_project1
-#### Briscini matteo [10709075] <br><br><br>
-#### INDEX: <br>
-- [IOT\_project1](#iot_project1)
-      - [Briscini matteo \[10709075\] ](#briscini-matteo-10709075-)
-      - [INDEX: ](#index-)
-  - [**Requirements summary**](#requirements-summary)
-  - [**Implementation**](#implementation)
-    - [**Performing a sensor data measurement**](#performing-a-sensor-data-measurement)
-    - [**Sending info on the parking state**](#sending-info-on-the-parking-state)
-    - [**Going to deep sleep**](#going-to-deep-sleep)
-  - [**Data analysis**](#data-analysis)
-    - [**esp32 duty cycle**](#esp32-duty-cycle)
-    - [**hc-sr04 energy absorption**](#hc-sr04-energy-absorption)
-    - [**esp\_now energy absorption**](#esp_now-energy-absorption)
-    - [**Analysis on data summary**](#analysis-on-data-summary)
-  - [**Battery life estimation**](#battery-life-estimation)
-    - [**Deep sleep power absorption**](#deep-sleep-power-absorption)
-    - [**Distance measure power absorption**](#distance-measure-power-absorption)
-    - [**Transmission power absorption**](#transmission-power-absorption)
-    - [**Waiting for response power absorption**](#waiting-for-response-power-absorption)
-    - [**Total energy absorption and battery life estimation**](#total-energy-absorption-and-battery-life-estimation)
-  - [**Possible improvements**](#possible-improvements)
-    - [**Send and forget**](#send-and-forget)
-    - [**Longer deep-sleep time**](#longer-deep-sleep-time)
-    - [**Non constant deep-sleep time**](#non-constant-deep-sleep-time)
-    - [**Transmit only on changes**](#transmit-only-on-changes)
-
-
-
-<div style="page-break-after: always;"></div>
 
 ## **Requirements summary**
 ![alt text](img\sensor_schema.png)<br>
@@ -56,8 +17,6 @@ The wake-up timer is set to 30 seconds; after the wake up, the sensor will perfo
 
 >**note:** the whole implementation is provided [here](project_iot_basicv1.zip)
 
-<div style="page-break-after: always;"></div>
-
 ### **Performing a sensor data measurement**
 The HC-SR04 ultrasonic distance sensor has 4 pins:
 * **VCC** voltage supply 5v
@@ -65,7 +24,7 @@ The HC-SR04 ultrasonic distance sensor has 4 pins:
 * **TRIG** require a puls of 10uS to start the measure
 * **ECHO** to get the distance
   > **note:** the distance is retrieved in terms of pulse durations (microseconds), the following formula is used to compute the distance in centimeters.
-  $$ D_{cm} = T_{pulseduration} \cdot 0.034/ 2 $$
+  $ D_{cm} = T_{pulseduration} \cdot 0.034/ 2 $
 
 As specified in the documentation, this sensor can read distances between 2 cm - 450 cm. <br>
 Following it is provided the function that performs the sensor measurements and the data structure used to save the results.
@@ -100,7 +59,6 @@ static const char *ParkingSpotStat_STRING[] = {
     FOREACH_PARKING(GENERATE_STRING) 
 };
 ```
-
 ### **Sending info on the parking state**
 In this phase, the node turns on the wifi, sends the message (FREE or OCCUPIED) to the specified MAC address (throw esp_now protocol), waits for 2000 microseconds (to avoid communication error and to get an eventual response), and turns off the wifi again.
 >**note:** in reality, the two last operations are implemented inside the *goToDeepSleep* function, but they are reported here for clearness.
@@ -150,9 +108,6 @@ void goToDeepSleep(){
  esp_deep_sleep_start();
 }
 ```
-
-<div style="page-break-after: always;"></div>
-
 ## **Data analysis**
 To estimate battery life we measured real energy consumption data in different situations. On the provided samples we had to compute the k-mean estimator to ignore measurement noise.
 > **note:** we have noticed differents consumption data in identical device state in different situations (probabily caused by experimentl erros), we are going always to use the worst data available.
@@ -161,15 +116,10 @@ Following you can find a summary of the data analysis in terms of graphycal rapp
 
 ### **esp32 duty cycle**
 ![alt text](img\image.png)
-
-<div style="page-break-after: always;"></div>
-
 ### **hc-sr04 energy absorption**
 ![alt text](img\image-1.png)
 ### **esp_now energy absorption**
 ![alt text](img\image-2.png)
-
-<div style="page-break-after: always;"></div>
 
 ### **Analysis on data summary**
 | state                      | total energy absorption          |
@@ -183,53 +133,53 @@ Following you can find a summary of the data analysis in terms of graphycal rapp
 
 ## **Battery life estimation**
 The duty cycle of the node can be split in 6 phases: deep sleep, wake up, perform a distance measure, send the provided data, wait for response, go to sleep.
- $$ T_{sleep} \Rightarrow T_{wake-up} \Rightarrow T_{sensor-measure} \Rightarrow T_{tx} \Rightarrow T_{wifi-on} \Rightarrow T_{go-to-sleep} $$
+ $ T_{sleep} \Rightarrow T_{wake-up} \Rightarrow T_{sensor-measure} \Rightarrow T_{tx} \Rightarrow T_{wifi-on} \Rightarrow T_{go-to-sleep} $
 The required time to wake up and to go to sleep is near to zero, also the required energy amount (for those two phases) is limited, so this 2 phases can be ignored. <br>
 So the total energy consumption for a single cycle becomes:
-$$E_{tot} = E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx} \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on} $$
+$E_{tot} = E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx} \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on} $
 
 We need to evaluate each term independently.
 
 ### **Deep sleep power absorption**
 As said above the device is going to stay in deep sleep mode for 30 seconds, so we can compute the absorption as follows:
-$$ E_{sleep} \cdot T_{sleep} == 1.795,8\cdot10^{-3}J$$
+$E_{sleep} \cdot T_{sleep} == 1.795,8\cdot10^{-3}J$
 
 ### **Distance measure power absorption**
 The sensor measures the pulse duration, so the required time to perform a measure change with the measured distance as expressed in the following formula:
-$$ T_{sensor-measure} = \dfrac{distance\cdot2}{0,034}J$$
+$ T_{sensor-measure} = \dfrac{distance\cdot2}{0,034}J$
 Let's consider the worst cases:
 * **free parking spot:**  $distance = 450 cm (max distance) \implies T_{sensor-measure} = 26470\cdot10^{-9}s$
 * **occupied parking spot:** $distance = 50 cm \implies T_{sensor-measure} = 2941\cdot10^{-9}s$
 
 As specified in the documentation, the HC-SR04 requires, as a start-measure signal, that the input *trig* stay high for $\delta t =10\cdot10^{-9}s$.
 <br>The worst case possible, in terms of power absorption required to perform distance measurements, is when the parking spot is always free:
-$$E_{sensor-measure} \cdot (T_{sensor-measure}+\delta t)= 1,2\cdot10^{-5}J$$ 
+$E_{sensor-measure} \cdot (T_{sensor-measure}+\delta t)= 1,2\cdot10^{-5}J$
 A more reasonable situation is when the parking spot is free for 50% of the performed measures:
-$$ E_{sensor-measure} \cdot T_{sensor-measure} = E_{sensor-measure} \cdot (T_{sensor-measure}^{free} \cdot 50\% + T_{sensor-measure}^{occupied} \cdot 50\% + \delta t) = 6,85\cdot10^{-6} J$$
+$ E_{sensor-measure} \cdot T_{sensor-measure} = E_{sensor-measure} \cdot (T_{sensor-measure}^{free} \cdot 50\% + T_{sensor-measure}^{occupied} \cdot 50\% + \delta t) = 6,85\cdot10^{-6} J$
 
 ### **Transmission power absorption**
 We need to compute the transmission time, ESP_now allow to send packet with 250 bytes of data, assuming a header of 6 bytes (MAC_address size) L = 256 byte = 2048 bit. <br>
 Assuming the protocol always sends the whole packet and knowing that the transmission rate is set  to 1 Mbps (as default), we can compute the transmission time as follows:
-$$ T_{tx} = \dfrac{L}{R} = 2,048\cdot10^{-3} s$$
+$T_{tx} = \dfrac{L}{R} = 2,048\cdot10^{-3} s$
 We measured the instantaneous absorption for 2 different transmissions (2 dBm, 19.5 dBm default setting).
-$$ E_{tx}^{2dBm} \cdot T_{tx} = 1,632\cdot10^{-3} J$$
-$$ E_{tx}^{19.5dBm} \cdot T_{tx} = 2,502\cdot10^{-3} J$$
+$ E_{tx}^{2dBm} \cdot T_{tx} = 1,632\cdot10^{-3} J$
+$ E_{tx}^{19.5dBm} \cdot T_{tx} = 2,502\cdot10^{-3} J$
 
 ### **Waiting for response power absorption**
 To avoid communication errors (and eventually receive messages) the sensors will wait with wifi antenna on for 2 ms after completed the state transmission.<br> We can compute the energy consumption in this phase as follows:
-$$ E_{wifi-on} \cdot T_{wifi-on} = 1,551\cdot10^{-3} J $$
+$ E_{wifi-on} \cdot T_{wifi-on} = 1,551\cdot10^{-3} J $
 
 ### **Total energy absorption and battery life estimation**
 We want to evaluate the battery life, in terms of numbers of completed cycles, for both the power transmission settings.
 
 * power of transmission 2 dBm
-$$ E_{tot}^{2dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{2dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on} \simeq 1,799 J$$
+$E_{tot}^{2dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{2dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on} \simeq 1,799 J$
 
 * power of transmission 19.5 dBm
-$$ E_{tot}^{19.5dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{19.5dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on}  \simeq 1,799 J$$
+$ E_{tot}^{19.5dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{19.5dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on}  \simeq 1,799 J$
 >**note:** there isn't a significant advantage in reducing the transmission power of the wifi antenna, in fact the number of cycles does not change.
 
-$$\implies N_{cicles} = \dfrac{9080}{E_{tot}^{2dBm}} \simeq 5047$$ 
+$\implies N_{cicles} = \dfrac{9080}{E_{tot}^{2dBm}} \simeq 5047$
 
 In conclusion, the sensor has enough power for above 42 h.
 
@@ -239,8 +189,6 @@ This chapter provides some implementation improvements designed to reduce the to
 ### **Send and forget**
 A first simple improvement is to apply a *send-and-forget* paradigm to wifi messages, avoiding keeping the wifi antenna powered for 2000 microseconds after sending the sensor state through the ESP_now message.<br>
 This improvement allows us to save $1,551\cdot10^{-3} J $ the equivalent of 4,35 cycles.
-
-<div style="page-break-after: always;"></div>
 
 ### **Longer deep-sleep time**
 It is reasonable to think that increasing the deep sleep time is a great improvement, but this is not the case.<br> 

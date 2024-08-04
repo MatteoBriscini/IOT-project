@@ -1,30 +1,10 @@
-<script type="text/javascript" 
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
-</script>
-
 # IOT_project3
-#### Briscini matteo [10709075] <br><br><br>
-#### INDEX: <br>
-
-1. [Requirements summary](#requirements-summary)
-2. [Implementation](#implementation)
-   * [Data generation](#data-generation)
-   * [Data receiving and message parsing](#data-receiving-and-message-parsing)
-   * [Message reaction](#message-reaction)
-3. [Testing](#testing)
-
-<div style="page-break-after: always;"></div>
-
 ## **Requirements summary**
 Use node-red to parse a sequence of MQTT messages (saved in [challenge3.csv](csv\challenge3.csv)) and perform different actions based on the message's content.
 In particular:
 * if a message contains "Publish Message" the node will forward the message on the specified MQTT topic and the message payload is saved inside [filtered_pubs.csv](csv\filtered_pubs.csv).
 * if the message contains an MQTT ACK the node will increment a global ack counter, perform an HTTP request on [ThingSpeack](https://thingspeak.com/channels/2507855) update the field1 value with the ack number, the message content is saved inside [ack_log.csv](csv\ack_log.csv).
 * other messages will be discarded.
-
 ## **Implementation**
 We will split the whole implementation into 3 different phases: data generation, data receiving and message parsing, message reaction.
 
@@ -38,8 +18,6 @@ All the messages sent in this phase are saved in a CSV file, named [id_log.csv](
  {"id": 7781, "timestamp":1710930219} //message payload example
 ```
 "Is ready?" switch is used, combined with start and stop to emulate a physical switch on the device.
-
-<div style="page-break-after: always;"></div>
 
 #### *Relevant JS function & blocks*
 * **config (on start)** <br>
@@ -65,8 +43,6 @@ All the messages sent in this phase are saved in a CSV file, named [id_log.csv](
   return msg;
   ```
 
-<div style="page-break-after: always;"></div>
-
 ### **Data receiving and message parsing**
 ![alt text](img\nodeRedschema2.png)<br>
 This block will receive up to 80 messages on "challenge3/id_generator" topic, and it uses the message id to get the correct row in the [challenge3.csv](challenge3.csv) file; based on the row content, the flow will be reacting differently (as specified in requirement summary). In this phase the correct reaction is triggered. <br>
@@ -85,8 +61,6 @@ When the flow has already received 80 messages or occurs in error (in every stag
 * **reaction choice switch** <br>
   Based on the received message, if required it triggers the correct reaction.
 
-<div style="page-break-after: always;"></div>
-
 ### **Message reaction**
 ![alt text](img\nodeRedschema3.png)<br>
 The requirements ask to react to 2 different message classes: published and ACK messages.
@@ -98,9 +72,6 @@ As shown in the following example, a single message can contain multiple MQTT to
   // received info & payload example, containing all the message payload and top where forward
   "Publish Message [hospital/room2], Publish Message [hospital/building5], Publish Message [hospital/department2]","{""range"": [4, 50], ""description"": ""Room Temperature"", ""type"": ""temperature"", ""unit"": ""C"", ""lat"": 66, ""long"": 92},{""type"": ""temperature"", ""lat"": 81, ""long"": 95, ""unit"": ""C"", ""range"": [3, 50], ""description"": ""Room Temperature""},{""description"": ""Room Temperature"", ""lat"": 55, ""unit"": ""K"", ""type"": ""temperature"", ""long"": 88, ""range"": [7, 41]},"
   ```
-
-<div style="page-break-after: always;"></div>
-
 #### *Relevant JS function & blocks*
 
 * **input data parser** <br>
@@ -181,9 +152,6 @@ As shown in the following example, a single message can contain multiple MQTT to
 
 #### **Ack reaction**
 In this phase the flow will react to MQTT messages containing an ACK (of any type). ACK messages are saved on [ack_log.csv](csv\ack_log.csv) file in terms of timestamp, sub_id, msg_type. Additionally, the flow will count the total amount of ACK messages (on a global counter) and it will publish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
-
-<div style="page-break-after: always;"></div>
-
 #### *Relevant JS function & blocks*
 
 * **input data parser & counter increment** <br>
@@ -212,8 +180,6 @@ In this phase the flow will react to MQTT messages containing an ACK (of any typ
 * **throw HTTP exception** <br>
   The thingspeak API will respond with zero in case of problems with the HTTP get request, if such value is received this block will raise an exception consequently stopping the whole flow.
 
-<div style="page-break-after: always;"></div>
-
 ## **Testing**
 A Python tool for testing purposes is provided [here](testIOT_3.ipynb). The purpose of the tester is to verify the correct correlation between the various CSV files published from the flow during a run.
 > **note:** to generate a CSV files useful for testing, it is necessary to disable the limit on messages per second for the "publish reaction" brach, otherwise some messages can be discarded. Some CSV files generated in such way are provided in this [folder](csv\testing_output).
@@ -222,8 +188,6 @@ A Python tool for testing purposes is provided [here](testIOT_3.ipynb). The purp
 
 Following is provided the full test output:
 ![alt text](img\outputTest.png)
-
-<div style="page-break-after: always;"></div>
 
 #### Entire output
 |index|id|type|response|
@@ -309,4 +273,3 @@ Following is provided the full test output:
 |78|3810|Publish Message|🟢|
 |79|118|Subscribe Ack \(id=3\)|🟢|
 |80|1623|others|🟢|
-

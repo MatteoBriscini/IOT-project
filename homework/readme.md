@@ -1,10 +1,3 @@
-<script type="text/javascript" 
-  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
-</script>
-
 ![alt text](img\track1.png)
 
 ### **Q1 ~ propose an overall design for the system, mainly focusing on the communication technology to be used. Motivate your choice** <br><br>
@@ -28,7 +21,7 @@ The cluster node act as a CoAP server, it's indipendently connected to each seno
 ![alt text](img\main_network.png)<br>
 The main network has to cover longer distances so a wired network is probably inconvinient; due to the small ammount of data excanged between cluster nodes and coordinator the wirless network can be based on comunication protocols designed with small data packets like ZigBee (frequency-band: 2.4GHz, bit rate: 250kb/s). <br>
 To ensure reliability ZigBee network must run in Beacon Enabled mod to avoid collisions (with CAP time equal to zero), once an hour the coordinator will send a beacon and will receive updated data from each of the 20 cluster nodes; each cluster node will provide all the data in a single message with a fixed data length of 5 Bytes (the whole messages stays in a single packet with the standard size of 128 Bytes), the CFP time can be computed as follows:
-$$ T_{CFP} = 20\cdot(\dfrac{128\cdot8}{250\cdot10^3}) \simeq 0,082s$$
+$ T_{CFP} = 20\cdot(\dfrac{128\cdot8}{250\cdot10^3}) \simeq 0,082s$
 ZigBee has a theoretical distance range of 100 m, so our implementation is required to use mesh topology to extend the maximum reachable distance (all the cluster nodes are full-function devices, compatible with AODV routing, and can contribute to the mesh network).<br>
 
 >**note:** cluster Tree routing can also extend the maximum reachable distance, however, this routing algorithm is static and less reliable.
@@ -71,48 +64,38 @@ Pseudocode for clusterNode nodes (with redundancy):
   }
   ```
 
-<div style="page-break-after: always;"></div>
-
-### **Q3 ~ as an add-on, you are required to install a VGA camera (640x480 pixels, 8 bits per pixel) to monitor the status of the growing process. Is the solution proposed at the previous points still valid? If not, propose an alternative solution.**
+  ### **Q3 ~ as an add-on, you are required to install a VGA camera (640x480 pixels, 8 bits per pixel) to monitor the status of the growing process. Is the solution proposed at the previous points still valid? If not, propose an alternative solution.**
 Adding a VGA camera to the infrastructure significantly increases the amount of data exchanged on the 2 networks. <br>
 The peripheral network is already suitable for big amounts of data and can be maintained identically by simply adding the VGA camera as a new sensor node. However ZigBee is not designed for high traffic and continuous communication, so the main network requires additional attention. <br>
 2 solutions are possible, the main network can be completely replaced with a communication technology capable of handling larger data packets, and one option can be WiFi, which can ensure high reliability and greater transmission capacity. <br>
 Alternatively, we can keep the previous network unchanged keeping ZigBee connectivity between cluster nodes and the coordinator, but providing an additional network (wired as ethernet, or wireless as WiFi) with its dedicated access point, in this configuration VGA camera will not be plugged to the cluster node, but it will communicate directly with the coordinator. A dedicated network more suitable for such different traffic topologies can justify the additional complexity of this second configuration, moreover if the VGA camera is added in a later time, with the previous network already running, this option allows a transparent update.
 >**note:** in the second case, particular attention is required to avoid interference, WiFi and ZigBee work on the same frequency-band (2.4 Ghz), channels must be seated properly.
 
-<div style="page-break-after: always;"></div>
-
 ![alt text](img\track2.png)
 
 ### **Q4 ~ What is the beacon interval (BI) in ms?**
 
-$$ BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s = 102,4ms$$
+$ BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s = 102,4ms$
 
 ### **Q5 ~ What is the slot time (Ts) in ms?**
 
-$$T_{slot}= \dfrac{L}{R} = \dfrac{128\cdot*8}{250\cdot10^3}=4,096\cdot10^{-3}s = 4,096ms$$
+$T_{slot}= \dfrac{L}{R} = \dfrac{128\cdot*8}{250\cdot10^3}=4,096\cdot10^{-3}s = 4,096ms$
 
 ### **Q6 ~ Assuming the maximum duty cycle allowed is 30%, what is the active part of the superframe (Tactive) in ms?**
 
-$$ T_{active} = T_{CFP} = 0,3\cdot BI = 0,03072s = 30,72ms $$
+$T_{active} = T_{CFP} = 0,3\cdot BI = 0,03072s = 30,72ms $
 
 ### **Q7 ~ How many active slots are there in the CFP?**
 
-$$ N_{slots} = \left(\dfrac{T_{CFP}}{T_{slot}}-1\right) = 6,5 \simeq 6 slots\space(lower-approximation)$$
+$N_{slots} = \left(\dfrac{T_{CFP}}{T_{slot}}-1\right) = 6,5 \simeq 6 slots\space(lower-approximation)$
 > **note:** 7 if we also consider the slot used for the beacon 
-### **Q8 ~ How many inactive slots are there in the CFP?**
-
-$$ N_{active-slots} = \dfrac{BI-T_{CFP}}{T_{slot}} = 17,5 \simeq 18slots$$
+### **Q8 ~ How many inactive slots are there in the CFP?*
+$N_{active-slots} = \dfrac{BI-T_{CFP}}{T_{slot}} = 17,5 \simeq 18slots$
 
 ### **Q9 ~ How many motes can join the network?**
 considering the worst case (all the device transmit simultaneusly with r=20kb/s):
 
-$$ N_{devices} = N_{slots}\cdot\dfrac{min(r)}{max(r)}=6\cdot\dfrac{10}{20}=3devices $$
-
-
-
-<div style="page-break-after: always;"></div>
-
+$N_{devices} = N_{slots}\cdot\dfrac{min(r)}{max(r)}=6\cdot\dfrac{10}{20}=3devices $
 ![alt text](img\track3.png)
 
 ### **Q10 ~ What are the main factors you would look at to make your final choice?**
