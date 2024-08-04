@@ -1,19 +1,19 @@
 # IOT_project3
 ## **Requirements summary**
-Use node-red to parse a sequence of MQTT messages (saved in [challenge3.csv](csv\challenge3.csv)) and perform different actions based on the message's content.
+Use node-red to parse a sequence of MQTT messages (saved in [challenge3.csv](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/csv/challenge3.csv)) and perform different actions based on the message's content.
 In particular:
-* if a message contains "Publish Message" the node will forward the message on the specified MQTT topic and the message payload is saved inside [filtered_pubs.csv](csv\filtered_pubs.csv).
-* if the message contains an MQTT ACK the node will increment a global ack counter, perform an HTTP request on [ThingSpeack](https://thingspeak.com/channels/2507855) update the field1 value with the ack number, the message content is saved inside [ack_log.csv](csv\ack_log.csv).
+* if a message contains "Publish Message" the node will forward the message on the specified MQTT topic and the message payload is saved inside [filtered_pubs.csv](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/csv/filtered_pubs.csv).
+* if the message contains an MQTT ACK the node will increment a global ack counter, perform an HTTP request on [ThingSpeack](https://thingspeak.com/channels/2507855) update the field1 value with the ack number, the message content is saved inside [ack_log.csv](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/csv/ack_log.csv).
 * other messages will be discarded.
 ## **Implementation**
 We will split the whole implementation into 3 different phases: data generation, data receiving and message parsing, message reaction.
 
-> **note:** the complete implementation is provided [here](nodered.txt)
+> **note:** the complete implementation is provided [here](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/nodered.txt)
 
 ### **Data generation**
-![alt text](img\nodeRedschema1.png)<br>
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/img/nodeRedSchema1.png)<br>
 In this phase the flow will generate random data, it will save it in a CSV file and send it locally through MQTT on the "challenge3/id_generator" topic with the following payload. If the inject named "timestamp" is enabled, a message every 5 seconds will be sent.
-All the messages sent in this phase are saved in a CSV file, named [id_log.csv](csv\id_log.csv).
+All the messages sent in this phase are saved in a CSV file, named [id_log.csv](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/csv/id_log.csv).
 ```
  {"id": 7781, "timestamp":1710930219} //message payload example
 ```
@@ -44,8 +44,8 @@ All the messages sent in this phase are saved in a CSV file, named [id_log.csv](
   ```
 
 ### **Data receiving and message parsing**
-![alt text](img\nodeRedschema2.png)<br>
-This block will receive up to 80 messages on "challenge3/id_generator" topic, and it uses the message id to get the correct row in the [challenge3.csv](challenge3.csv) file; based on the row content, the flow will be reacting differently (as specified in requirement summary). In this phase the correct reaction is triggered. <br>
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/img/nodeRedSchema2.png)<br>
+This block will receive up to 80 messages on "challenge3/id_generator" topic, and it uses the message id to get the correct row in the [challenge3.csv](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/csv/challenge3.csv) file; based on the row content, the flow will be reacting differently (as specified in requirement summary). In this phase the correct reaction is triggered. <br>
 When the flow has already received 80 messages or occurs in error (in every stage), the stop function sets "is ready?" to false, stopping messages publishing on the "challenge3/id_generator" topic.
 
 #### *Relevant JS function & blocks*
@@ -62,7 +62,7 @@ When the flow has already received 80 messages or occurs in error (in every stag
   Based on the received message, if required it triggers the correct reaction.
 
 ### **Message reaction**
-![alt text](img\nodeRedschema3.png)<br>
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/img/nodeRedSchema3.png)<br>
 The requirements ask to react to 2 different message classes: published and ACK messages.
 #### **Publish reaction**
 In this phase the flow will react to MQTT messages of class "Publish Message", in particular publishing messages with specified payload on the required MQTT topic. Additionally, if a message payload contains a temperature in Fahrenheit, it is saved in the [filtered_pubs.csv](csv\filtered_pubs.csv) file and its value is plotted on a UI graph (a screenshot of this graph is provided below). <br> <br>
@@ -151,7 +151,7 @@ As shown in the following example, a single message can contain multiple MQTT to
 
 
 #### **Ack reaction**
-In this phase the flow will react to MQTT messages containing an ACK (of any type). ACK messages are saved on [ack_log.csv](csv\ack_log.csv) file in terms of timestamp, sub_id, msg_type. Additionally, the flow will count the total amount of ACK messages (on a global counter) and it will publish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
+In this phase the flow will react to MQTT messages containing an ACK (of any type). ACK messages are saved on [ack_log.csv](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/csv/ack_log.csv) file in terms of timestamp, sub_id, msg_type. Additionally, the flow will count the total amount of ACK messages (on a global counter) and it will publish that data on [ThingSpeack](https://thingspeak.com/channels/2507855).
 #### *Relevant JS function & blocks*
 
 * **input data parser & counter increment** <br>
@@ -187,7 +187,7 @@ A Python tool for testing purposes is provided [here](testIOT_3.ipynb). The purp
 <br>
 
 Following is provided the full test output:
-![alt text](img\outputTest.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project3/project/img/outputTest.png)
 
 #### Entire output
 |index|id|type|response|
