@@ -1,4 +1,4 @@
-# internet of things project
+# Internet of things project
 
 Tags: `#IOT`, `#C`, `#JS`, `#MQTT`, `#ESP32`, `#esp_now` , `#HC-SR04`, `#nodered`, `#power_consumption`, `#polimi`.
 
@@ -12,10 +12,10 @@ Academic Year: 2023/2024.
 
 ## Specification 
 In this GitHub repository is provided material from IOT course optional activities.
-the activities is structured in 3 small projects (complete 2 projects was enought to acieve the maximum score) and one theorical homework.
+the activities are structured into 3 small projects (completing 2 projects was enough to achieve the maximum score) and one theoretical homework.
 
-## Folder structory
-- [**project1**]() ~ parking occupancy node, on ESP32
+## Folder structure
+- [**project1**](https://github.com/MatteoBriscini/IOT-project/tree/master/IOT_project1) ~ parking occupancy node, on ESP32
 - **project2** (skipped)
-- [**project3**]() ~ node-red and MQTT 
-- [**theorical homework**]()
+- [**project3**](https://github.com/MatteoBriscini/IOT-project/tree/master/IOT_project3) ~ node-red and MQTT 
+- [**theoretical homework**](https://github.com/MatteoBriscini/IOT-project/tree/master/homework)
