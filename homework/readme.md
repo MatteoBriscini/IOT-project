@@ -1,4 +1,4 @@
-![alt text](img\track1.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/homework/project/img/track1.png)
 
 ### **Q1 ~ propose an overall design for the system, mainly focusing on the communication technology to be used. Motivate your choice** <br><br>
 
@@ -9,19 +9,19 @@ Moreover, the direct power supply makes avoiding duty cycles (with deep sleep pe
 Since growing bacterial cellulose, as described, is a slow process, as default each basin will communicate its state once an hour, consequently allowing researchers to request additional data can be appropriate.<br>
 
 **Peripheral network (very short range):**
-![alt text](img\peripheral_network.png)<br>
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/homework/project/img/peripheral_network.png)<br>
 The peripheral network is characterized by a very short distance between actors (sensor and cluster nodes), so it can be easily implemented through wired protocols. <br>
 Each basin measure device comprises 3 independent sensor nodes (to enable error avoidance and simplify maintenance) connected to a cluster node through PoE (power over ethernet). The sensor nodes respectively measure the luminosity, sugar, and pH of the growing solution, they are programmed to perform 3 data measurements and send it to the cluster node as soon as they receive power.<br>
-The cluster node act as a CoAP server, it's indipendently connected to each senor node throught ethernet connectivity (no possible collisions in this stage, ACK is not required) and it also provide power supply (turning on the device only when it require data). Its role is to aggregate senor data into a single message (each sensor perform multiple reading to mitigate measurements errors, and perform one CoAP post request for each reading) and send it to the coordinator.<br>
+The cluster node acts as a CoAP server, it's indipendently connected to each senor node throught ethernet connectivity (no possible collisions in this stage, ACK is not required) and it also provide power supply (turning on the device only when it require data). Its role is to aggregate senor data into a single message (each sensor perform multiple reading to mitigate measurements errors, and perform one CoAP post request for each reading) and send it to the coordinator.<br>
 >**note:** this configuration allows sensor redundancy, if we attach multiple identical sensors to a cluster node, if (after raising power up) the main sensor does not respond (providing data) the cluster will ask data to the backup sensor.
 
 >**note:** In this configuration the cluster node is a single point of failure, it must be highly reliable.
 
 **Main network (short range):**
-![alt text](img\main_network.png)<br>
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/homework/project/img/main_network.png)<br>
 The main network has to cover longer distances so a wired network is probably inconvinient; due to the small ammount of data excanged between cluster nodes and coordinator the wirless network can be based on comunication protocols designed with small data packets like ZigBee (frequency-band: 2.4GHz, bit rate: 250kb/s). <br>
 To ensure reliability ZigBee network must run in Beacon Enabled mod to avoid collisions (with CAP time equal to zero), once an hour the coordinator will send a beacon and will receive updated data from each of the 20 cluster nodes; each cluster node will provide all the data in a single message with a fixed data length of 5 Bytes (the whole messages stays in a single packet with the standard size of 128 Bytes), the CFP time can be computed as follows:
-$ T_{CFP} = 20\cdot(\dfrac{128\cdot8}{250\cdot10^3}) \simeq 0,082s$
+$T_{CFP} = 20\cdot(\dfrac{128\cdot8}{250\cdot10^3}) \simeq 0,082s$
 ZigBee has a theoretical distance range of 100 m, so our implementation is required to use mesh topology to extend the maximum reachable distance (all the cluster nodes are full-function devices, compatible with AODV routing, and can contribute to the mesh network).<br>
 
 >**note:** cluster Tree routing can also extend the maximum reachable distance, however, this routing algorithm is static and less reliable.
@@ -71,11 +71,11 @@ The peripheral network is already suitable for big amounts of data and can be ma
 Alternatively, we can keep the previous network unchanged keeping ZigBee connectivity between cluster nodes and the coordinator, but providing an additional network (wired as ethernet, or wireless as WiFi) with its dedicated access point, in this configuration VGA camera will not be plugged to the cluster node, but it will communicate directly with the coordinator. A dedicated network more suitable for such different traffic topologies can justify the additional complexity of this second configuration, moreover if the VGA camera is added in a later time, with the previous network already running, this option allows a transparent update.
 >**note:** in the second case, particular attention is required to avoid interference, WiFi and ZigBee work on the same frequency-band (2.4 Ghz), channels must be seated properly.
 
-![alt text](img\track2.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/homework/project/img/track2.png)
 
 ### **Q4 ~ What is the beacon interval (BI) in ms?**
 
-$ BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s = 102,4ms$
+$BI = \dfrac{L}{r} = \dfrac{128\cdot8}{10\cdot10^3} = 0,1024s = 102,4ms$
 
 ### **Q5 ~ What is the slot time (Ts) in ms?**
 
@@ -96,7 +96,7 @@ $N_{active-slots} = \dfrac{BI-T_{CFP}}{T_{slot}} = 17,5 \simeq 18slots$
 considering the worst case (all the device transmit simultaneusly with r=20kb/s):
 
 $N_{devices} = N_{slots}\cdot\dfrac{min(r)}{max(r)}=6\cdot\dfrac{10}{20}=3devices $
-![alt text](img\track3.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/homework/project/img/track3.png)
 
 ### **Q10 ~ What are the main factors you would look at to make your final choice?**
 Various environmental and economic factors can condition the choosing between LoRa and NB-Iot, however there are some key aspects to consider when choosing between LoRa and NB-IoT:
