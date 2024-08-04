@@ -1,7 +1,7 @@
 # IOT_project1
 
 ## **Requirements summary**
-![alt text](img\sensor_schema.png)<br>
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project1/project/img/sensor_schema.png)<br>
 The project goal is to implement parking occupancy node, on an ESP32 connected with the HC-SR04 ultrasonic distance sensor (as represented in the schematic above). <br>
 Using esp_now for wifi communication purposes and a battery as an alimentation supply.
 > **note:** the parking is considered OCCUPIED if the measured distance is less than 50 cm
@@ -15,7 +15,7 @@ The wake-up timer is set to 30 seconds; after the wake up, the sensor will perfo
 4.  turn of wifi antenna
 5.  set the EPS32 in deep sleep mode
 
->**note:** the whole implementation is provided [here](project_iot_basicv1.zip)
+>**note:** the whole implementation is provided [here]([project_iot_basicv1.zip](https://github.com/MatteoBriscini/IOT-project/tree/master/IOT_project1/project/project_iot_basicv1))
 
 ### **Performing a sensor data measurement**
 The HC-SR04 ultrasonic distance sensor has 4 pins:
@@ -112,14 +112,14 @@ void goToDeepSleep(){
 To estimate battery life we measured real energy consumption data in different situations. On the provided samples we had to compute the k-mean estimator to ignore measurement noise.
 > **note:** we have noticed differents consumption data in identical device state in different situations (probabily caused by experimentl erros), we are going always to use the worst data available.
 
-Following you can find a summary of the data analysis in terms of graphycal rappresentation and tables, but the full analysis provided [here](dataAnalysis.ipynb).
+Following you can find a summary of the data analysis in terms of graphycal rappresentation and tables, but the full analysis provided [here](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project1/project/dataAnalysis.ipynb).
 
 ### **esp32 duty cycle**
-![alt text](img\image.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project1/project/img/image.png)
 ### **hc-sr04 energy absorption**
-![alt text](img\image-1.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project1/project/img/image-1.png)
 ### **esp_now energy absorption**
-![alt text](img\image-2.png)
+![alt text](https://github.com/MatteoBriscini/IOT-project/blob/master/IOT_project1/project/img/image-2.png)
 
 ### **Analysis on data summary**
 | state                      | total energy absorption          |
@@ -155,19 +155,19 @@ As specified in the documentation, the HC-SR04 requires, as a start-measure sign
 <br>The worst case possible, in terms of power absorption required to perform distance measurements, is when the parking spot is always free:
 $E_{sensor-measure} \cdot (T_{sensor-measure}+\delta t)= 1,2\cdot10^{-5}J$
 A more reasonable situation is when the parking spot is free for 50% of the performed measures:
-$ E_{sensor-measure} \cdot T_{sensor-measure} = E_{sensor-measure} \cdot (T_{sensor-measure}^{free} \cdot 50\% + T_{sensor-measure}^{occupied} \cdot 50\% + \delta t) = 6,85\cdot10^{-6} J$
+$E_{sensor-measure} \cdot T_{sensor-measure} = E_{sensor-measure} \cdot (T_{sensor-measure}^{free} \cdot 50\% + T_{sensor-measure}^{occupied} \cdot 50\% + \delta t) = 6,85\cdot10^{-6} J$
 
 ### **Transmission power absorption**
 We need to compute the transmission time, ESP_now allow to send packet with 250 bytes of data, assuming a header of 6 bytes (MAC_address size) L = 256 byte = 2048 bit. <br>
 Assuming the protocol always sends the whole packet and knowing that the transmission rate is set  to 1 Mbps (as default), we can compute the transmission time as follows:
 $T_{tx} = \dfrac{L}{R} = 2,048\cdot10^{-3} s$
 We measured the instantaneous absorption for 2 different transmissions (2 dBm, 19.5 dBm default setting).
-$ E_{tx}^{2dBm} \cdot T_{tx} = 1,632\cdot10^{-3} J$
-$ E_{tx}^{19.5dBm} \cdot T_{tx} = 2,502\cdot10^{-3} J$
+$E_{tx}^{2dBm} \cdot T_{tx} = 1,632\cdot10^{-3} J$
+$E_{tx}^{19.5dBm} \cdot T_{tx} = 2,502\cdot10^{-3} J$
 
 ### **Waiting for response power absorption**
 To avoid communication errors (and eventually receive messages) the sensors will wait with wifi antenna on for 2 ms after completed the state transmission.<br> We can compute the energy consumption in this phase as follows:
-$ E_{wifi-on} \cdot T_{wifi-on} = 1,551\cdot10^{-3} J $
+$E_{wifi-on} \cdot T_{wifi-on} = 1,551\cdot10^{-3} J$
 
 ### **Total energy absorption and battery life estimation**
 We want to evaluate the battery life, in terms of numbers of completed cycles, for both the power transmission settings.
@@ -176,7 +176,7 @@ We want to evaluate the battery life, in terms of numbers of completed cycles, f
 $E_{tot}^{2dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{2dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on} \simeq 1,799 J$
 
 * power of transmission 19.5 dBm
-$ E_{tot}^{19.5dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{19.5dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on}  \simeq 1,799 J$
+$E_{tot}^{19.5dBm} =  E_{sleep} \cdot T_{sleep} + E_{sensor-measure} \cdot T_{sensor-measure} + E_{tx}^{19.5dBm}  \cdot T_{tx} + E_{wifi-on} \cdot T_{wifi-on}  \simeq 1,799 J$
 >**note:** there isn't a significant advantage in reducing the transmission power of the wifi antenna, in fact the number of cycles does not change.
 
 $\implies N_{cicles} = \dfrac{9080}{E_{tot}^{2dBm}} \simeq 5047$
@@ -188,7 +188,7 @@ In conclusion, the sensor has enough power for above 42 h.
 This chapter provides some implementation improvements designed to reduce the total energy absorption.
 ### **Send and forget**
 A first simple improvement is to apply a *send-and-forget* paradigm to wifi messages, avoiding keeping the wifi antenna powered for 2000 microseconds after sending the sensor state through the ESP_now message.<br>
-This improvement allows us to save $1,551\cdot10^{-3} J $ the equivalent of 4,35 cycles.
+This improvement allows us to save $1,551\cdot10^{-3} J$ the equivalent of 4,35 cycles.
 
 ### **Longer deep-sleep time**
 It is reasonable to think that increasing the deep sleep time is a great improvement, but this is not the case.<br> 
@@ -219,7 +219,7 @@ ParkingSpotState getPreviousState(){
 }
 ```
 
->**note:** the modified implementation for this improvement is provided [here](project_iot_improvedV.zip).
+>**note:** the modified implementation for this improvement is provided [here](https://github.com/MatteoBriscini/IOT-project/tree/master/IOT_project1/project/project_iot_improvedV).
 
 <br>
 In conclusion, there are no ways to stretch the battery life in a significant way by simply adapting the implementation.<br>
